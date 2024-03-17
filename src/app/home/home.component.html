@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<div id="navbar">
+  <span>TaskManager</span>
+
+  <div>
+    <button routerLink="login" *ngIf="!userService.isLoggedIn()">Log in</button>
+    <button routerLink="signup" *ngIf="!userService.isLoggedIn()">Sign up</button>
+    <button *ngIf="userService.isLoggedIn()" (click)="userService.logoutUser()">Logout</button>
+  </div>
+</div>
+
+<div id="container">
+  <h1>{{userService.isLoggedIn()? 'Hello ' + userService.currentUser.fullName + '!' : 'Hello there!'}}</h1>
+  <p> Add new Tasks and mark them as Done, Pending or Ongoing </p>
+
+  <div id="overlay" *ngIf="showMore"></div>
+
+  <div id="newTaskFields" [ngClass]="{'newTaskFieldsAbsolute': showMore}">
+    <div id="titleBox">
+      <input type="text" name="title" [(ngModel)]="thisTitle" required placeholder="Title of new Task..."
+        title="Title of the Task" (focus)="showMore = true" maxlength="30" />
+      <button id="moreButton" *ngIf="showMore" (click)="showMore = false">
+        <mat-icon aria-hidden="false" aria-label="Collapse New Task Fields">expand_less</mat-icon>
+      </button>
+    </div>
+
+    <textarea type="text" name="description" [(ngModel)]="thisDescription" placeholder="Details of the task..."
+      title="Description of the Task" *ngIf="showMore">
+    </textarea>
+
+    <button title="Save this Task" (click)="onSave()" *ngIf="showMore" id="saveButton">
+      Save
+    </button>
+  </div>
+
+  <div id="todoListContainer">
+    <div *ngFor="let todo of todoService.todoList; let i = index">
+      <todo-list-item [todo]="todo" [index]="i" [expandedIndex]="expandedIndex" (expandedThis)="expandedIndex = $event"
+        (statusChanged)="onStatusChange(i, $event)" (removeThis)="onRemoveToDo(i)"></todo-list-item>
+    </div>
+  </div>
+
+  <div *ngIf="todoService.todoList.length == 0" id="emptyListPlaceholder">
+    <img src="./../../assets/empty.svg">
+
+    <p>You have no Pending Tasks</p>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
